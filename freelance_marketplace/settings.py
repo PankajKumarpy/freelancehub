@@ -20,7 +20,9 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,.vercel.app', cast=Csv())
+
+CSRF_TRUSTED_ORIGINS = ['https://*.vercel.app']
 
 
 # ==================== APPLICATIONS ====================

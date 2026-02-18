@@ -14,14 +14,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ==================== SECURITY ====================
 
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-fallback-key-for-build-process')
 
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 
 
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,.vercel.app', cast=Csv())
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost,.vercel.app', cast=Csv())
 
 CSRF_TRUSTED_ORIGINS = ['https://*.vercel.app']
 

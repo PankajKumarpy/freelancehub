@@ -3,6 +3,7 @@ Django settings for freelance_marketplace project.
 Production-ready configuration using python-decouple for environment variables.
 """
 
+import os
 from pathlib import Path
 from decouple import config, Csv
 import dj_database_url
@@ -78,6 +79,13 @@ DATABASES = {
         cast=dj_database_url.parse
     )
 }
+
+# Vercel-specific: Use /tmp for SQLite if no DATABASE_URL is set
+if 'VERCEL' in os.environ and not config('DATABASE_URL', default=''):
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': '/tmp/db.sqlite3',
+    }
 
 
 # ==================== PASSWORD VALIDATION ====================

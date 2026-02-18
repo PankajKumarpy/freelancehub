@@ -1,0 +1,62 @@
+{% extends 'marketplace/base.html' %}
+
+{% block title %}Chat with {{ other_user.username }} - Freelance Marketplace{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex align-items-center">
+                        <a href="{% url 'message_list' %}" class="text-white me-3">
+                            <i class="bi bi-arrow-left"></i>
+                        </a>
+                        <div class="rounded-circle bg-white text-primary d-inline-flex align-items-center justify-content-center me-3"
+                            style="width: 40px; height: 40px;">
+                            {{ other_user.username.0|upper }}
+                        </div>
+                        <h5 class="mb-0">{{ other_user.username }}</h5>
+                    </div>
+                </div>
+                <div class="card-body" style="height: 500px; overflow-y: auto;" id="messageContainer">
+                    {% if messages_list %}
+                    {% for message in messages_list %}
+                    <div class="mb-3 {% if message.sender == user %}text-end{% endif %}">
+                        <div class="d-inline-block p-3 rounded {% if message.sender == user %}bg-primary text-white{% else %}bg-light{% endif %}"
+                            style="max-width: 70%;">
+                            <p class="mb-1">{{ message.content }}</p>
+                            <small class="{% if message.sender == user %}text-white-50{% else %}text-muted{% endif %}">
+                                {{ message.timestamp|date:"M d, H:i" }}
+                            </small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-muted text-center">No messages yet. Start the conversation!</p>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            {{ form.content }}
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send"></i> Send
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auto-scroll to bottom of messages
+    const messageContainer = document.getElementById('messageContainer');
+    if (messageContainer) {
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+    }
+</script>
+{% endblock %}

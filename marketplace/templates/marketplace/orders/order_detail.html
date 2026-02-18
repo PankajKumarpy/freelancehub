@@ -1,0 +1,111 @@
+﻿{% extends 'marketplace/base.html' %}
+
+{% block title %}Order #{{ order.id }} - Freelance Marketplace{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Order #{{ order.id }}</h4>
+                </div>
+                <div class="card-body">
+                    <h5>
+                        {% if order.gig %}
+                        {{ order.gig.title }}
+                        {% elif order.job %}
+                        {{ order.job.title }}
+                        {% endif %}
+                    </h5>
+                    <p class="text-muted">
+                        {% if order.gig %}
+                        {{ order.gig.description }}
+                        {% elif order.job %}
+                        {{ order.job.description }}
+                        {% endif %}
+                    </p>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Client:</strong> {{ order.client.username }}</p>
+                            <p><strong>Freelancer:</strong> {{ order.freelancer.username }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Price:</strong> ₹{{ order.price }}</p>
+                            <p><strong>Status:</strong>
+                                <span
+                                    class="badge bg-{% if order.status == 'Completed' %}success{% elif order.status == 'In Progress' %}warning{% else %}secondary{% endif %}">
+                                    {{ order.status }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <p><strong>Created:</strong> {{ order.created_at|date:"M d, Y H:i" }}</p>
+                    {% if order.completed_at %}
+                    <p><strong>Completed:</strong> {{ order.completed_at|date:"M d, Y H:i" }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Review Section -->
+            {% if review %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-star-fill text-warning"></i> Review</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <strong>{{ order.client.username }}</strong>
+                        <span class="text-warning">
+                            {% for i in "12345" %}
+                            {% if forloop.counter <= review.rating %} <i class="bi bi-star-fill"></i>
+                                {% else %}
+                                <i class="bi bi-star"></i>
+                                {% endif %}
+                                {% endfor %}
+                        </span>
+                    </div>
+                    <p>{{ review.review_text }}</p>
+                    <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Actions</h5>
+
+                    {% if user == order.client and order.status == 'In Progress' %}
+                    <a href="{% url 'complete_order' order.id %}" class="btn btn-success w-100 mb-2">
+                        <i class="bi bi-check-circle"></i> Mark as Complete
+                    </a>
+                    {% endif %}
+
+                    {% if user == order.client and order.status == 'Completed' and not review %}
+                    <a href="{% url 'submit_review' order.id %}" class="btn btn-warning w-100 mb-2">
+                        <i class="bi bi-star"></i> Leave a Review
+                    </a>
+                    {% endif %}
+
+                    {% if user == order.client %}
+                    <a href="{% url 'send_message' order.freelancer.id %}" class="btn btn-outline-primary w-100 mb-2">
+                        <i class="bi bi-chat-dots"></i> Message Freelancer
+                    </a>
+                    {% else %}
+                    <a href="{% url 'send_message' order.client.id %}" class="btn btn-outline-primary w-100 mb-2">
+                        <i class="bi bi-chat-dots"></i> Message Client
+                    </a>
+                    {% endif %}
+
+                    <a href="{% url 'order_list' %}" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-arrow-left"></i> Back to Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

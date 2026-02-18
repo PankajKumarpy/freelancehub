@@ -1,0 +1,147 @@
+﻿{% extends 'marketplace/base.html' %}
+
+{% block title %}Profile - {{ profile_user.username }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-4">
+            <!-- Profile Card -->
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    {% if freelancer_profile and freelancer_profile.profile_picture %}
+                    <img src="{{ freelancer_profile.profile_picture.url }}" class="rounded-circle mb-3" width="150"
+                        height="150" alt="{{ profile_user.username }}">
+                    {% elif client_profile and client_profile.profile_picture %}
+                    <img src="{{ client_profile.profile_picture.url }}" class="rounded-circle mb-3" width="150"
+                        height="150" alt="{{ profile_user.username }}">
+                    {% else %}
+                    <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-3"
+                        style="width: 150px; height: 150px; font-size: 4rem;">
+                        {{ profile_user.username.0|upper }}
+                    </div>
+                    {% endif %}
+
+                    <h3>{{ profile_user.get_full_name|default:profile_user.username }}</h3>
+                    <p class="text-muted">@{{ profile_user.username }}</p>
+
+                    {% if freelancer_profile %}
+                    <div class="mb-3">
+                        <span class="badge bg-primary">Freelancer</span>
+                        <div class="mt-2">
+                            <span class="text-warning">
+                                <i class="bi bi-star-fill"></i> {{ freelancer_profile.rating|floatformat:1 }}
+                            </span>
+                        </div>
+                    </div>
+                    {% elif client_profile %}
+                    <span class="badge bg-success">Client</span>
+                    {% endif %}
+
+                    {% if user == profile_user %}
+                    <a href="{% url 'profile_edit' %}" class="btn btn-primary w-100 mt-3">
+                        <i class="bi bi-pencil"></i> Edit Profile
+                    </a>
+                    {% else %}
+                    <a href="{% url 'send_message' profile_user.id %}" class="btn btn-primary w-100 mt-3">
+                        <i class="bi bi-chat-dots"></i> Send Message
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            {% if freelancer_profile %}
+            <!-- Freelancer Info -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">About</h5>
+                    <p class="card-text">{{ freelancer_profile.bio }}</p>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Skills:</strong> {{ freelancer_profile.skills }}</p>
+                            <p><strong>Experience:</strong> {{ freelancer_profile.experience }} years</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Hourly Rate:</strong> ₹{{ freelancer_profile.hourly_rate }}</p>
+                            <p><strong>Total Earnings:</strong> ₹{{ freelancer_profile.total_earnings }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gigs -->
+            {% if gigs %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-grid-3x3-gap"></i> Active Gigs</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        {% for gig in gigs %}
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                {% if gig.image %}
+                                <img src="{{ gig.image.url }}" class="card-img-top" alt="{{ gig.title }}"
+                                    style="height: 150px; object-fit: cover;">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ gig.title|truncatewords:5 }}</h6>
+                                    <p class="text-primary fw-bold">₹{{ gig.price }}</p>
+                                    <a href="{% url 'gig_detail' gig.pk %}" class="btn btn-sm btn-primary">View</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Reviews -->
+            {% if reviews %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-star-fill text-warning"></i> Reviews</h5>
+                </div>
+                <div class="card-body">
+                    {% for review in reviews %}
+                    <div class="mb-3 pb-3 border-bottom">
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ review.order.client.username }}</strong>
+                            <span class="text-warning">
+                                {% for i in "12345" %}
+                                {% if forloop.counter <= review.rating %} <i class="bi bi-star-fill"></i>
+                                    {% else %}
+                                    <i class="bi bi-star"></i>
+                                    {% endif %}
+                                    {% endfor %}
+                            </span>
+                        </div>
+                        <p class="text-muted mb-0">{{ review.review_text }}</p>
+                        <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% elif client_profile %}
+            <!-- Client Info -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Client Information</h5>
+                    {% if client_profile.company_name %}
+                    <p><strong>Company:</strong> {{ client_profile.company_name }}</p>
+                    {% endif %}
+                    <p><strong>Contact:</strong> {{ client_profile.contact_info }}</p>
+                    <p><strong>Member Since:</strong> {{ profile_user.date_joined|date:"M Y" }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

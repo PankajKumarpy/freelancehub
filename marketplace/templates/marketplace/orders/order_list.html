@@ -1,0 +1,72 @@
+﻿{% extends 'marketplace/base.html' %}
+
+{% block title %}Orders - Freelance Marketplace{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1 class="display-5 fw-bold">My Orders</h1>
+        <p class="lead">Manage your active and completed orders</p>
+    </div>
+</div>
+
+<div class="container my-4">
+    {% if orders %}
+    <div class="row g-4">
+        {% for order in orders %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5 class="card-title">
+                                {% if order.gig %}
+                                {{ order.gig.title }}
+                                {% elif order.job %}
+                                {{ order.job.title }}
+                                {% else %}
+                                Order #{{ order.id }}
+                                {% endif %}
+                            </h5>
+                            <p class="text-muted mb-2">
+                                {% if user.freelancer_profile %}
+                                Client: {{ order.client.username }}
+                                {% else %}
+                                Freelancer: {{ order.freelancer.username }}
+                                {% endif %}
+                            </p>
+                            <div class="d-flex gap-2">
+                                <span
+                                    class="badge bg-{% if order.status == 'Completed' %}success{% elif order.status == 'In Progress' %}warning{% elif order.status == 'Cancelled' %}danger{% else %}secondary{% endif %}">
+                                    {{ order.status }}
+                                </span>
+                                <span class="text-muted small">
+                                    <i class="bi bi-calendar"></i> {{ order.created_at|date:"M d, Y" }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <h4 class="text-primary mb-3">₹{{ order.price }}</h4>
+                            <a href="{% url 'order_detail' order.id %}" class="btn btn-primary">
+                                View Details <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-inbox" style="font-size: 4rem; color: #ccc;"></i>
+        <h4 class="mt-3 text-muted">No orders yet</h4>
+        <p class="text-muted">Start browsing gigs or posting jobs</p>
+        <div class="mt-3">
+            <a href="{% url 'gig_list' %}" class="btn btn-primary me-2">Browse Gigs</a>
+            <a href="{% url 'job_list' %}" class="btn btn-outline-primary">Find Jobs</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

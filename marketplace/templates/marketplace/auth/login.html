@@ -1,0 +1,51 @@
+{% extends 'marketplace/base.html' %}
+
+{% block title %}Login - FreelanceHub{% endblock %}
+
+{% block content %}
+<div style="min-height:80vh;display:flex;align-items:center;padding:3rem 0;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-lg-4">
+
+                <!-- Logo -->
+                <div class="text-center mb-4">
+                    <div
+                        style="width:52px;height:52px;background:white;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+                        <i class="bi bi-lightning-charge-fill" style="color:#000;font-size:1.4rem;"></i>
+                    </div>
+                    <h2 style="font-weight:800;letter-spacing:-0.5px;margin-bottom:0.25rem;">Welcome back</h2>
+                    <p style="color:rgba(255,255,255,0.45);font-size:0.9rem;">Sign in to your account</p>
+                </div>
+
+                <div class="glass-panel p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username"
+                                placeholder="Enter username" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password"
+                                placeholder="Enter password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mb-3" style="padding:0.8rem;">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                        </button>
+                    </form>
+                    <div class="text-center">
+                        <p style="color:rgba(255,255,255,0.4);font-size:0.9rem;margin:0;">
+                            Don't have an account?
+                            <a href="{% url 'register' %}"
+                                style="color:rgba(255,255,255,0.8);font-weight:600;text-decoration:none;"> Sign up</a>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

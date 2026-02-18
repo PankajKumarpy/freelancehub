@@ -1,0 +1,156 @@
+﻿{% extends 'marketplace/base.html' %}
+
+{% block title %}{{ job.title }} - Freelance Marketplace{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Job Details -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="card-title">{{ job.title }}</h2>
+                    <div class="d-flex gap-2 mb-3">
+                        {% if job.category %}
+                        <span class="badge bg-secondary">{{ job.category.name }}</span>
+                        {% endif %}
+                        <span
+                            class="badge bg-{% if job.status == 'Open' %}success{% elif job.status == 'In Progress' %}warning{% else %}info{% endif %}">
+                            {{ job.status }}
+                        </span>
+                    </div>
+                    <p class="card-text">{{ job.description }}</p>
+                    <hr>
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <i class="bi bi-cash text-primary" style="font-size: 2rem;"></i>
+                            <h5 class="mt-2">₹{{ job.budget }}</h5>
+                            <small class="text-muted">Budget</small>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="bi bi-calendar text-primary" style="font-size: 2rem;"></i>
+                            <h5 class="mt-2">{{ job.deadline }}</h5>
+                            <small class="text-muted">Deadline</small>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="bi bi-chat-left-text text-primary" style="font-size: 2rem;"></i>
+                            <h5 class="mt-2">{{ bids.count }}</h5>
+                            <small class="text-muted">Bids</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent text-muted">
+                    Posted by {{ job.client.username }} on {{ job.created_at|date:"M d, Y" }}
+                </div>
+            </div>
+
+            <!-- Bids Section -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-people-fill"></i> Bids ({{ bids.count }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if bids %}
+                    {% for bid in bids %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6>{{ bid.freelancer.username }}</h6>
+                                    <p class="mb-2">{{ bid.proposal_text }}</p>
+                                    <div class="d-flex gap-3">
+                                        <span class="text-primary fw-bold">₹{{ bid.bid_amount }}</span>
+                                        <span class="text-muted">
+                                            <i class="bi bi-clock"></i> {{ bid.delivery_days }} days
+                                        </span>
+                                        <span
+                                            class="badge bg-{% if bid.status == 'Accepted' %}success{% elif bid.status == 'Rejected' %}danger{% else %}warning{% endif %}">
+                                            {{ bid.status }}
+                                        </span>
+                                    </div>
+                                </div>
+                                {% if user == job.client and bid.status == 'Pending' and job.status == 'Open' %}
+                                <a href="{% url 'accept_bid' bid.id %}" class="btn btn-sm btn-success">
+                                    <i class="bi bi-check-circle"></i> Accept
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-muted text-center">No bids yet. Be the first to bid!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <!-- Submit Bid Card -->
+            {% if user.is_authenticated and user.freelancer_profile and job.status == 'Open' %}
+            {% if not user_bid %}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Submit Your Bid</h5>
+                    <form method="post" action="{% url 'submit_bid' job.id %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Proposal</label>
+                            {{ bid_form.proposal_text }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Bid Amount ($)</label>
+                            {{ bid_form.bid_amount }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Delivery (days)</label>
+                            {{ bid_form.delivery_days }}
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-send"></i> Submit Bid
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-success">
+                        <i class="bi bi-check-circle"></i> Bid Submitted
+                    </h5>
+                    <p class="text-muted">You have already submitted a bid for this job.</p>
+                    <div class="alert alert-info">
+                        <strong>Your Bid:</strong> ₹{{ user_bid.bid_amount }}<br>
+                        <strong>Status:</strong> {{ user_bid.status }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% elif not user.is_authenticated %}
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Want to bid?</h5>
+                    <p class="text-muted">Login as a freelancer to submit your bid</p>
+                    <a href="{% url 'login' %}" class="btn btn-primary w-100">
+                        Login
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Client Actions -->
+            {% if user == job.client %}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Job Actions</h5>
+                    <p class="text-muted small">Manage your job posting</p>
+                    <a href="{% url 'job_list' %}" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-arrow-left"></i> Back to Jobs
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,118 @@
+﻿{% extends 'marketplace/base.html' %}
+
+{% block title %}Freelancer Dashboard - FreelanceHub{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div class="container">
+        <p style="font-size:0.85rem;text-transform:uppercase;letter-spacing:0.15em;color:rgba(255,255,255,0.4);font-weight:600;margin-bottom:0.5rem;">Freelancer</p>
+        <h1 style="font-size:2.8rem;font-weight:900;letter-spacing:-1.5px;">Dashboard</h1>
+        <p style="color:rgba(255,255,255,0.5);font-size:1.05rem;margin:0;">Welcome back, {{ user.get_full_name|default:user.username }}!</p>
+    </div>
+</div>
+
+<div class="container" style="padding-bottom:4rem;">
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="glass-panel p-4 text-center">
+                <i class="bi bi-cash-coin" style="font-size:2.5rem;color:rgba(255,255,255,0.5);"></i>
+                <h3 style="font-size:2rem;font-weight:900;margin:0.75rem 0 0.25rem;">₹{{ total_earnings|floatformat:2 }}</h3>
+                <p style="color:rgba(255,255,255,0.4);font-size:0.85rem;margin:0;">Total Earnings</p>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="glass-panel p-4 text-center">
+                <i class="bi bi-hourglass-split" style="font-size:2.5rem;color:rgba(255,255,255,0.5);"></i>
+                <h3 style="font-size:2rem;font-weight:900;margin:0.75rem 0 0.25rem;">{{ active_orders }}</h3>
+                <p style="color:rgba(255,255,255,0.4);font-size:0.85rem;margin:0;">Active Orders</p>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="glass-panel p-4 text-center">
+                <i class="bi bi-check-circle" style="font-size:2.5rem;color:rgba(255,255,255,0.5);"></i>
+                <h3 style="font-size:2rem;font-weight:900;margin:0.75rem 0 0.25rem;">{{ completed_orders }}</h3>
+                <p style="color:rgba(255,255,255,0.4);font-size:0.85rem;margin:0;">Completed</p>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="glass-panel p-4 text-center">
+                <i class="bi bi-star-fill" style="font-size:2.5rem;color:rgba(255,255,255,0.5);"></i>
+                <h3 style="font-size:2rem;font-weight:900;margin:0.75rem 0 0.25rem;">{{ freelancer_profile.rating|floatformat:1 }}</h3>
+                <p style="color:rgba(255,255,255,0.4);font-size:0.85rem;margin:0;">Rating</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="glass-panel p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 style="font-weight:700;margin:0;"><i class="bi bi-cart3 me-2"></i>Recent Orders</h5>
+                    <a href="{% url 'order_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                {% if recent_orders %}
+                {% for order in recent_orders %}
+                <div class="d-flex justify-content-between align-items-center py-3" style="border-bottom:1px solid rgba(255,255,255,0.07);">
+                    <div>
+                        <div style="font-weight:600;font-size:0.9rem;">
+                            {% if order.gig %}{{ order.gig.title|truncatewords:5 }}{% else %}{{ order.job.title|truncatewords:5 }}{% endif %}
+                        </div>
+                        <small style="color:rgba(255,255,255,0.35);">Client: {{ order.client.username }}</small>
+                    </div>
+                    <div class="text-end">
+                        <div style="font-weight:800;">₹{{ order.price }}</div>
+                        {% if order.status == "Completed" %}
+                        <span class="badge bg-success">{{ order.status }}</span>
+                        {% elif order.status == "In Progress" %}
+                        <span class="badge bg-warning">{{ order.status }}</span>
+                        {% else %}
+                        <span class="badge bg-secondary">{{ order.status }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p style="color:rgba(255,255,255,0.35);text-align:center;padding:2rem 0;">No orders yet</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="glass-panel p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 style="font-weight:700;margin:0;"><i class="bi bi-send me-2"></i>Pending Bids</h5>
+                    <a href="{% url 'job_list' %}" class="btn btn-sm btn-outline-primary">Find Jobs</a>
+                </div>
+                {% if pending_bids %}
+                {% for bid in pending_bids %}
+                <div class="d-flex justify-content-between align-items-center py-3" style="border-bottom:1px solid rgba(255,255,255,0.07);">
+                    <div>
+                        <div style="font-weight:600;font-size:0.9rem;">{{ bid.job.title|truncatewords:5 }}</div>
+                        <small style="color:rgba(255,255,255,0.35);">Bid: ₹{{ bid.bid_amount }}</small>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-warning">{{ bid.status }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p style="color:rgba(255,255,255,0.35);text-align:center;padding:2rem 0;">No pending bids</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-panel p-4">
+        <h5 style="font-weight:700;margin-bottom:1rem;"><i class="bi bi-lightning-fill me-2"></i>Quick Actions</h5>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{% url 'gig_create' %}" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i>Create New Gig</a>
+            <a href="{% url 'gig_list' %}" class="btn btn-outline-primary"><i class="bi bi-grid-3x3-gap me-1"></i>My Gigs</a>
+            <a href="{% url 'job_list' %}" class="btn btn-outline-primary"><i class="bi bi-search me-1"></i>Find Jobs</a>
+            <a href="{% url 'profile_edit' %}" class="btn btn-outline-primary"><i class="bi bi-person me-1"></i>Edit Profile</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

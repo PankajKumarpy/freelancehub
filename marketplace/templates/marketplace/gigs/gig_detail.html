@@ -1,0 +1,128 @@
+﻿{% extends 'marketplace/base.html' %}
+
+{% block title %}{{ gig.title }} - Freelance Marketplace{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Gig Image -->
+            {% if gig.image %}
+            <img src="{{ gig.image.url }}" class="img-fluid rounded mb-4" alt="{{ gig.title }}">
+            {% else %}
+            <div class="rounded mb-4"
+                style="height: 400px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+            {% endif %}
+
+            <!-- Gig Details -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="card-title">{{ gig.title }}</h2>
+                    {% if gig.category %}
+                    <span class="badge bg-secondary mb-3">{{ gig.category.name }}</span>
+                    {% endif %}
+                    <p class="card-text">{{ gig.description }}</p>
+                </div>
+            </div>
+
+            <!-- Reviews -->
+            {% if reviews %}
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-star-fill text-warning"></i> Reviews</h5>
+                </div>
+                <div class="card-body">
+                    {% for review in reviews %}
+                    <div class="mb-3 pb-3 border-bottom">
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ review.order.client.username }}</strong>
+                            <span class="text-warning">
+                                {% for i in "12345" %}
+                                {% if forloop.counter <= review.rating %} <i class="bi bi-star-fill"></i>
+                                    {% else %}
+                                    <i class="bi bi-star"></i>
+                                    {% endif %}
+                                    {% endfor %}
+                            </span>
+                        </div>
+                        <p class="text-muted mb-0">{{ review.review_text }}</p>
+                        <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-4">
+            <!-- Pricing Card -->
+            <div class="card mb-4 sticky-top" style="top: 20px;">
+                <div class="card-body">
+                    <h3 class="text-primary mb-3">₹{{ gig.price }}</h3>
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2">
+                            <i class="bi bi-clock text-primary"></i>
+                            <strong>Delivery:</strong> {{ gig.delivery_time }} days
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-calendar text-primary"></i>
+                            <strong>Posted:</strong> {{ gig.created_at|date:"M d, Y" }}
+                        </li>
+                    </ul>
+
+                    {% if user.is_authenticated %}
+                    {% if user == gig.freelancer %}
+                    <a href="{% url 'gig_edit' gig.pk %}" class="btn btn-warning w-100 mb-2">
+                        <i class="bi bi-pencil"></i> Edit Gig
+                    </a>
+                    <a href="{% url 'gig_delete' gig.pk %}" class="btn btn-outline-danger w-100">
+                        <i class="bi bi-trash"></i> Delete Gig
+                    </a>
+                    {% elif user.client_profile %}
+                    <a href="{% url 'purchase_gig' gig.id %}" class="btn btn-primary w-100 mb-2">
+                        <i class="bi bi-cart-plus"></i> Order Now
+                    </a>
+                    <a href="{% url 'send_message' gig.freelancer.id %}" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-chat-dots"></i> Contact Seller
+                    </a>
+                    {% endif %}
+                    {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-primary w-100">
+                        Login to Order
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Freelancer Card -->
+            {% if freelancer_profile %}
+            <div class="card">
+                <div class="card-body text-center">
+                    <h6 class="card-title">About the Seller</h6>
+                    {% if freelancer_profile.profile_picture %}
+                    <img src="{{ freelancer_profile.profile_picture.url }}" class="rounded-circle mb-3" width="80"
+                        height="80" alt="{{ gig.freelancer.username }}">
+                    {% else %}
+                    <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-3"
+                        style="width: 80px; height: 80px; font-size: 2rem;">
+                        {{ gig.freelancer.username.0|upper }}
+                    </div>
+                    {% endif %}
+                    <h6>{{ gig.freelancer.get_full_name|default:gig.freelancer.username }}</h6>
+                    <div class="mb-2">
+                        <span class="text-warning">
+                            <i class="bi bi-star-fill"></i> {{ freelancer_profile.rating|floatformat:1 }}
+                        </span>
+                    </div>
+                    <p class="small text-muted">{{ freelancer_profile.bio|truncatewords:20 }}</p>
+                    <a href="{% url 'profile_view_user' gig.freelancer.username %}"
+                        class="btn btn-sm btn-outline-primary">
+                        View Profile
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

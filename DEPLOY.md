@@ -75,5 +75,5 @@ python manage.py runserver
 
 - **Never commit `.env`** — it's in `.gitignore`
 - **Media files** (user uploads) are not persisted on Railway/Render free tier — consider Cloudinary for production
-- **Database** — SQLite works for small deployments; upgrade to PostgreSQL for larger scale
+- **Database** — **CRITICAL:** SQLite is fine for testing but **will lose data** on every deployment/restart on platforms like Railway/Render. **You MUST add a PostgreSQL addon** (e.g., Railway Postgres, Render Postgres) for persistent data.
 - **Admin panel** — available at `/admin/` after creating a superuser

@@ -13,24 +13,7 @@ from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'freelance_marketplace.settings')
 
-# Vercel-specific: Add venv to path because we installed deps there
-if 'VERCEL' in os.environ:
-    import site
-    import sys
-    
-    # Path to where Vercel puts the source code (project root)
-    BASE_DIR = Path(__file__).resolve().parent.parent
-    
-    # Add venv site-packages
-    # Note: Python version might vary, so we glob it
-    venv_site_packages = BASE_DIR / 'venv' / 'lib'
-    if venv_site_packages.exists():
-        for python_dir in venv_site_packages.glob('python3.*'):
-            site_packages = python_dir / 'site-packages'
-            if site_packages.exists():
-                site.addsitedir(str(site_packages))
-                sys.path.insert(0, str(site_packages)) # prioritize venv
-                print(f"Added venv to path: {site_packages}")
+
 
 # Vercel-specific: Copy SQLite DB to /tmp if it doesn't exist
 if 'VERCEL' in os.environ:

@@ -82,10 +82,10 @@
                     {% if gig.category %}
                     <span class="badge bg-secondary mb-2" style="width:fit-content;">{{ gig.category.name }}</span>
                     {% endif %}
-                    <h6 style="font-weight:700;margin-bottom:0.5rem;line-height:1.4;min-height:42px;">{{ gig.title }}
-                    </h6>
+                    <h6 style="font-weight:700;margin-bottom:0.5rem;line-height:1.4;min-height:42px;">{{
+                        gig.title|truncatewords:7 }}</h6>
                     <p style="font-size:0.85rem;color:rgba(255,255,255,0.4);flex-grow:1;margin-bottom:1rem;">{{
-                        gig.description }}</p>
+                        gig.description|truncatewords:12 }}</p>
                     <div class="d-flex justify-content-between align-items-end mb-3">
                         <span style="font-size:1.3rem;font-weight:800;">₹{{ gig.price }}</span>
                         <div class="text-end">

@@ -16,7 +16,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-fallback-key-for-build-process')
 
-DEBUG = config('DEBUG', default=False, cast=bool)
+# TODO: Revert this to False after debugging
+DEBUG = config('DEBUG', default=True, cast=bool)
 
 
 
@@ -116,7 +117,7 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # WhiteNoise compressed static file storage
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
